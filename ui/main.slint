@@ -1,0 +1,66 @@
+import {Head} from "./components/head.slint";
+import {Left} from "./components/left.slint";
+import { Content } from "components/content.slint";
+import { StandardButton, Button  } from "std-widgets.slint";
+import { UserHandler } from "components/global.slint";
+import { InfoDialog } from "components/common.slint";
+
+export {UserHandler,User} from "components/global.slint";
+
+export component MainWindow inherits Window {
+    width: 800px;
+    height: 600px;
+    title: "Slint Application";
+    // no-frame: true; 
+     
+    icon: @image-url("./imgs/app.png");
+    property <bool> hidden-title:false;
+    property <length> menu-width:150px;
+    property <string> tab <=> menu.tab;
+    property <bool> dialog-visible <=> info.visible;
+    callback exit();
+    callback show-dialog(string);
+    info := InfoDialog {
+        z: 2;
+        visible: false;
+    }
+
+    show-dialog(msg) => {
+        info.message = msg;
+        info.visible = true;
+    }
+    VerticalLayout {
+        spacing: 3px;
+        Head {
+            height: 60px;
+            width: 100%;
+            title: "User Application";
+            menu-width: root.menu-width;
+            hidden-title: root.hidden-title;
+            display-menu => {
+                root.hidden-title = !root.hidden-title;
+                if (root.hidden-title) {
+                    root.menu-width = 50px;
+                } else {
+                    root.menu-width = 180px;
+                }
+            }
+            exit => {
+                root.exit();
+            }
+        }
+
+        HorizontalLayout {
+            padding: 5px;
+            spacing: 4px;
+            menu := Left {
+                hidden-title: root.hidden-title;
+                width: root.menu-width;
+            }
+
+            Content {
+                tab: root.tab;
+            }
+        }
+    }
+}

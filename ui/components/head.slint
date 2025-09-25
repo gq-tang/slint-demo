@@ -1,0 +1,50 @@
+export component Head inherits Rectangle {
+    width: 100%;
+    height: 55px;
+    background: #bbb;
+    in property <length> menu-width:180px;
+    in property <bool> hidden-title:false;
+    in property <string> title;
+    callback display-menu();
+    callback exit();
+    HorizontalLayout {
+        Rectangle {
+            width: menu-width;
+            if (!hidden-title):Text {
+                text: root.title;
+                font-size: 1.2rem;
+                font-weight: 600;
+            }
+        }
+
+        TouchArea {
+            width: 50px;
+            Image {
+                source: @image-url("../imgs/menu.png");
+            }
+
+            clicked => {
+                root.display-menu();
+            }
+        }
+
+        Rectangle {
+            horizontal-stretch: 1;
+        }
+
+        Rectangle {
+            HorizontalLayout {
+                alignment: end;
+                TouchArea {
+                    Image {
+                        source: @image-url("../imgs/exit.png");
+                    }
+
+                    clicked => {
+                        root.exit();
+                    }
+                }
+            }
+        }
+    }
+}

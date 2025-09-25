@@ -1,0 +1,130 @@
+
+import { GroupBox, CheckBox, StandardButton, Button } from "std-widgets.slint";
+export component InputWithPlaceholder inherits Rectangle {
+    in-out property <string> input-data <=> input.text;
+    in property <string> placeholder:"please input data";
+    in property <InputType> type:text;
+    callback focusing();
+    focusing => {
+        input.focus();
+    }
+    HorizontalLayout {
+        Rectangle {
+            border-width: 1px;
+            border-radius: 5px;
+            border-color: gray;
+            width: 90%;
+            clip: true;
+            Text {
+                text: root.placeholder;
+                color: gray;
+                visible: input.text == "";
+                vertical-alignment: center;
+                horizontal-alignment: left;
+                x: 5px;
+            }
+
+            input := TextInput {
+                vertical-alignment: center;
+                horizontal-alignment: left;
+                input-type: type;
+                x: 5px;
+            }
+        }
+
+        TouchArea {
+            visible: input.text != "";
+            Image {
+                source: @image-url("../imgs/close.png");
+                width: 32px;
+                height: 32px;
+                image-rendering: pixelated;
+            }
+
+            clicked => {
+                input.text = "";
+            }
+        }
+    }
+}
+
+export component FormTextItem inherits Rectangle {
+    height: 50px;
+    border-radius: 5px;
+    border-width: 1px;
+    border-color: white;
+    in property <string> label;
+    in-out property <string> input-data <=> input.input-data;
+    in property <string> placeholder;
+    in property <InputType> type;
+    callback focusing <=> input.focusing;
+    HorizontalLayout {
+        Rectangle {
+            width: 20%;
+            Text {
+                text: label;
+            }
+        }
+
+        input := InputWithPlaceholder {
+            width: 80%;
+            placeholder: placeholder;
+            type: type;
+        }
+    }
+}
+
+export component InfoDialog inherits Rectangle {
+    in property <string> message;
+    Rectangle {
+        background: #eee;
+        opacity: 0.2;
+    }
+
+    Rectangle {
+        width: 200px;
+        height: 150px;
+        border-radius: 8px;
+        border-color: blue;
+        border-width: 1px;
+        background: white;
+        x: (parent.width - self.width) / 2;
+        y: (parent.height - self.height) / 2;
+        VerticalLayout {
+            spacing: 20px;
+            padding: 5px;
+            alignment: center;
+            HorizontalLayout {
+                alignment: start;
+                spacing: 5px;
+                Image {
+                    source: @image-url("../imgs/info.png");
+                }
+
+                Text {
+                    text: "提示";
+                    font-size: 1.5rem;
+                    vertical-alignment: center;
+                }
+            }
+
+            Text {
+                text: root.message;
+                horizontal-alignment: center;
+            }
+
+            HorizontalLayout {
+                spacing: 10px;
+                alignment: end;
+                padding: 5px;
+                Button {
+                    text: "OK";
+                    width: 60px;
+                    clicked => {
+                        root.visible = false;
+                    }
+                }
+            }
+        }
+    }
+}

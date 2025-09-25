@@ -1,0 +1,15 @@
+ 
+export struct User{
+    id:int,
+    name:string,
+    age:int,
+    gender:string,
+    email:string,
+}
+
+export global UserHandler {
+    in-out property <[[StandardListViewItem]]> users;
+    in property <string> msg;
+    callback save-user(User);
+    callback list-user(string);
+}

@@ -1,0 +1,199 @@
+import {CheckBox, Button} from "std-widgets.slint"; 
+import {FormTextItem} from "./common.slint";
+import {User,UserHandler} from "./global.slint";
+
+component FormGenderItem inherits Rectangle {
+    height: 50px;
+    border-radius: 5px;
+    border-width: 1px;
+    border-color: white;
+    in property <string> label;
+    in-out property <string> gender:"man";
+    callback focusing();
+    focusing => {
+        man.focus();
+    }
+    HorizontalLayout {
+        Rectangle {
+            width: 20%;
+            Text {
+                text: label;
+            }
+        }
+
+        Rectangle {
+            HorizontalLayout {
+                spacing: 10px;
+                alignment: start;
+                man := CheckBox {
+                    text: "Man";
+                    checked: root.gender == "man";
+                    toggled => {
+                        root.gender = "man";
+                        female.checked = false;
+                    }
+                }
+
+                female := CheckBox {
+                    text: "Female";
+                    checked: root.gender == "female";
+                    toggled => {
+                        root.gender = "female";
+                        man.checked = false;
+                    }
+                }
+            }
+        }
+    }
+}
+
+component FormSubmit inherits Rectangle {
+    height: 40px;
+    callback submit;
+    callback reset;
+    HorizontalLayout {
+        padding-left: 20px;
+        padding-right: 20px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        spacing: 5px;
+        alignment: center;
+        Button {
+            text: "Submit";
+            min-width: 100px;
+            max-width: 200px;
+            height: parent.height;
+            primary: true;
+            clicked => {
+                root.submit();
+            }
+        }
+
+        Button {
+            text: "Reset";
+            min-width: 100px;
+            max-width: 200px;
+            height: parent.height;
+            primary: false;
+            clicked => {
+                root.reset();
+            }
+        }
+    }
+}
+
+export component AddUser inherits Rectangle {
+    property <User> user;
+    property <string> user-name <=> name.input-data;
+    property <string> user-age <=> age.input-data;
+    property <string> user-gender <=> gender.gender;
+    property <string> user-email <=> email.input-data;
+    callback show-info(string);
+    callback hide-info();
+    show-info(msg) => {
+        info.msg = msg;
+        info.visible = true;
+    }
+    hide-info => {
+        if info.visible {
+            info.visible = false;
+        }
+    }
+    VerticalLayout {
+        spacing: 5px;
+        name := FormTextItem {
+            label: "Username";
+            placeholder: "please input username";
+        }
+
+        age := FormTextItem {
+            label: "Age";
+            type: number;
+            placeholder: "please input age";
+        }
+
+        gender := FormGenderItem {
+            label: "Gender";
+            gender: user.gender;
+        }
+
+        email := FormTextItem {
+            label: "Email";
+            placeholder: "please input email address";
+            input-data: user.email;
+        }
+
+        info := Rectangle {
+            height: 30px;
+            width: parent.width;
+            visible: false;
+            in-out property <string> msg;
+            HorizontalLayout {
+                spacing: 10px;
+                Image {
+                    source: @image-url("../imgs/warning.png");
+                }
+
+                Text {
+                    text: msg;
+                    vertical-alignment: center;
+                }
+
+                Rectangle {
+                    horizontal-stretch: 1;
+                }
+
+                TouchArea {
+                    Image {
+                        width: 32px;
+                        height: 32px;
+                        image-rendering: pixelated;
+                        source: @image-url("../imgs/close.png");
+                    }
+
+                    clicked => {
+                        info.visible = false;
+                    }
+                }
+            }
+        }
+
+        FormSubmit {
+            submit => {
+                if user-name.is-empty {
+                    name.focusing();
+                    show-info("username is empty");
+                    return;
+                }
+                if user-age.is-empty {
+                    age.focusing();
+                    show-info("age is empty");
+                    return;
+                }
+                if user-gender.is-empty {
+                    gender.focusing();
+                    show-info("gender is empty");
+                    return;
+                }
+                if user-email.is-empty {
+                    email.focusing();
+                    show-info("email is empty");
+                    return;
+                }
+                hide-info();
+                user.name = user-name;
+                user.age = user-age.to-float();
+                user.gender = user-gender;
+                user.email = user-email;
+                UserHandler.save-user(user);
+            }
+            reset => {
+                user-name = "";
+                user-age = "";
+                user-gender = "";
+                user-email = "";
+                hide-info();
+            }
+        }
+    }
+}

@@ -1,0 +1,69 @@
+
+export component Left inherits Rectangle {
+    in-out property <string> tab:"add";
+    in property <bool> hidden-title:false;
+    width: 160px;
+    height: 100%;
+    background: #eee;
+    VerticalLayout {
+        Rectangle {
+            height: 40px;
+            background: #ddd;
+            TouchArea {
+                Image {
+                    x: 5px;
+                    source: @image-url("../imgs/add.png");
+                }
+
+                if (!root.hidden-title):Text {
+                    text: "Add";
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                    x: 40px;
+                }
+                clicked => {
+                    root.tab = "add";
+                }
+            }
+
+            states [
+                add-active when root.tab == "add": {
+                    background: white;
+                }
+                add-normal when root.tab != "add": {
+                    background: #ddd;
+                }
+            ]
+        }
+
+        Rectangle {
+            height: 40px;
+            background: #ddd;
+            TouchArea {
+                Image {
+                    x: 5px;
+                    source: @image-url("../imgs/list.png");
+                }
+
+                if (!root.hidden-title):Text {
+                    text: "List";
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                    x: 40px;
+                }
+                clicked => {
+                    root.tab = "list";
+                }
+            }
+
+            states [
+                list-active when root.tab == "list": {
+                    background: white;
+                }
+                list-normal when root.tab != "list": {
+                    background: #ddd;
+                }
+            ]
+        }
+    }
+}

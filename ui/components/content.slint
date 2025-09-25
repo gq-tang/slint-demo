@@ -1,0 +1,7 @@
+import { AddUser } from "add.slint";
+import { ListUser } from "list.slint";
+export component Content inherits Rectangle {
+    in property <string> tab:"add";
+    if (tab == "add"):AddUser { }
+    if (tab == "list"):ListUser { }
+}

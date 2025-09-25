@@ -1,0 +1,45 @@
+import { Button, StandardTableView } from "std-widgets.slint";
+import {UserHandler,User} from "global.slint";
+import { InputWithPlaceholder } from "common.slint";
+
+export component ListUser inherits Rectangle {
+    VerticalLayout {
+        alignment: start;
+        Rectangle {
+            height: 40px;
+            x: 20px;
+            HorizontalLayout {
+                alignment: start;
+                spacing: 10px;
+                search := InputWithPlaceholder {
+                    width: parent.width * 50%;
+                    placeholder: "please input username/email";
+                }
+
+                Rectangle {
+                    Button {
+                        text: "Search";
+                        primary: true;
+                        clicked => {
+                            UserHandler.list-user(search.input-data);
+                        }
+                    }
+                }
+            }
+        }
+
+        Rectangle {
+            StandardTableView {
+                width: parent.width;
+                columns: [
+                    { title:"ID" },
+                    { title:"Username" },
+                    { title:"Age" },
+                    { title:"Gender" },
+                    { title:"Email" }
+                ];
+                rows: UserHandler.users;
+            }
+        }
+    }
+}
