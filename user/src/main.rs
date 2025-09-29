@@ -5,7 +5,7 @@
 use std::{process, sync::Arc};
 
 use slint::{ComponentHandle, ModelRc, VecModel, quit_event_loop};
-use slint_demo::{
+use user::{
     model::{self},
     repository,
 };

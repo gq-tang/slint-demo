@@ -1,0 +1,296 @@
+import { Button, TextEdit } from "std-widgets.slint";
+component Keyboard inherits Rectangle {
+    callback keyPressed(string);
+    callback clean();
+    callback calculate();
+    callback delete();
+    GridLayout {
+        spacing: 10px;
+        padding: 10px;
+        Row {
+            Rectangle {
+                Button {
+                    text: "AC";
+                    width: parent.width;
+                    height: parent.height;
+                    clicked => {
+                        clean();
+                    }
+                }
+
+                col: 0;
+            }
+
+            Rectangle {
+                Button {
+                    text: "/";
+                    width: parent.width;
+                    height: parent.height;
+                    clicked => {
+                        keyPressed("/");
+                    }
+                }
+
+                col: 1;
+            }
+
+            Rectangle {
+                Button {
+                    text: "*";
+                    width: parent.width;
+                    height: parent.height;
+                    clicked => {
+                        keyPressed("*");
+                    }
+                }
+
+                col: 2;
+            }
+
+            Rectangle {
+                Button {
+                    text: "-";
+                    width: parent.width;
+                    height: parent.height;
+                    clicked => {
+                        keyPressed("-");
+                    }
+                }
+
+                col: 3;
+            }
+        }
+
+        Row {
+            Rectangle {
+                Button {
+                    text: "7";
+                    width: parent.width;
+                    height: parent.height;
+                    clicked => {
+                        keyPressed("7");
+                    }
+                }
+            }
+
+            Rectangle {
+                Button {
+                    text: "8";
+                    width: parent.width;
+                    height: parent.height;
+                    clicked => {
+                        keyPressed("8");
+                    }
+                }
+            }
+
+            Rectangle {
+                Button {
+                    text: "9";
+                    width: parent.width;
+                    height: parent.height;
+                    clicked => {
+                        keyPressed("9");
+                    }
+                }
+            }
+
+            Rectangle {
+                Button {
+                    text: "+";
+                    width: parent.width;
+                    height: parent.height;
+                    clicked => {
+                        keyPressed("+");
+                    }
+                }
+
+                row: 1;
+                col: 3;
+                rowspan: 2;
+            }
+        }
+
+        Row {
+            Rectangle {
+                Button {
+                    text: "4";
+                    width: parent.width;
+                    height: parent.height;
+                    clicked => {
+                        keyPressed("4");
+                    }
+                }
+            }
+
+            Rectangle {
+                Button {
+                    text: "5";
+                    width: parent.width;
+                    height: parent.height;
+                    clicked => {
+                        keyPressed("5");
+                    }
+                }
+            }
+
+            Rectangle {
+                Button {
+                    text: "6";
+                    width: parent.width;
+                    height: parent.height;
+                    clicked => {
+                        keyPressed("6");
+                    }
+                }
+            }
+        }
+
+        Row {
+            Rectangle {
+                Button {
+                    text: "1";
+                    width: parent.width;
+                    height: parent.height;
+                    clicked => {
+                        keyPressed("1");
+                    }
+                }
+            }
+
+            Rectangle {
+                Button {
+                    text: "2";
+                    width: parent.width;
+                    height: parent.height;
+                    clicked => {
+                        keyPressed("2");
+                    }
+                }
+            }
+
+            Rectangle {
+                Button {
+                    text: "3";
+                    width: parent.width;
+                    height: parent.height;
+                    clicked => {
+                        keyPressed("3");
+                    }
+                }
+            }
+
+            Rectangle {
+                Button {
+                    text: "Enter";
+                    width: parent.width;
+                    height: parent.height;
+                    clicked => {
+                        calculate();
+                    }
+                }
+
+                row: 3;
+                col: 3;
+                rowspan: 2;
+            }
+        }
+
+        Row {
+            Rectangle {
+                Button {
+                    text: "0";
+                    width: parent.width;
+                    height: parent.height;
+                    clicked => {
+                        keyPressed("0");
+                    }
+                }
+
+                col: 0;
+                row: 4;
+            }
+
+            Rectangle {
+                Button {
+                    text: ".";
+                    width: parent.width;
+                    height: parent.height;
+                    clicked => {
+                        keyPressed(".");
+                    }
+                }
+
+                col: 1;
+            }
+
+            Rectangle {
+                Button {
+                    text: "Del";
+                    width: parent.width;
+                    height: parent.height;
+                    clicked => {
+                        delete();
+                    }
+                }
+
+                col: 2;
+                row: 4;
+            }
+        }
+    }
+}
+
+export component MainWindow inherits Window {
+    width: 400px;
+    height: 400px;
+    title: "Calculator";
+    callback keyPressed <=> kb.keyPressed;
+    callback calculate <=> kb.calculate;
+    callback delete <=> kb.delete;
+    in-out property <string> exp <=> txt.text;
+    in-out property <string> result <=> records.text;
+    VerticalLayout {
+        padding: 10px;
+        Rectangle {
+            height: 100px;
+            border-color: #bbb;
+            border-radius: 5px;
+            border-width: 1px;
+            HorizontalLayout {
+                records := TextEdit {
+                    font-size: 1.1rem;
+                    read-only: true;
+                    width: parent.width;
+                    height: parent.height;
+                    horizontal-alignment: right;
+                }
+            }
+        }
+
+        Rectangle {
+            border-color: #bbb;
+            border-radius: 5px;
+            border-width: 1px;
+            HorizontalLayout {
+                padding: 10px;
+                Rectangle {
+                    txt := TextInput {
+                        text: "0";
+                        font-size: 1.5rem;
+                        width: parent.width;
+                        horizontal-alignment: right;
+                        vertical-alignment: center;
+                        read-only: true;
+                    }
+                }
+            }
+        }
+
+        kb := Keyboard {
+            clean => {
+                txt.text = "0";
+            }
+        }
+    }
+}
