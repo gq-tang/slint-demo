@@ -1,0 +1,162 @@
+import { ProgressIndicator, Button } from "std-widgets.slint";
+
+struct BreatheData{
+    left-progress:float,
+    left-time:int,
+    up-progress:float,
+    up-time:int,
+    right-progress:float,
+    right-time:int,
+    down-progress:float,
+    down-time:int, 
+}
+
+component Breathe inherits Rectangle {
+    background: transparent;
+    in property <BreatheData> data;
+    property <string> time-uinit:"s";
+    in property <length> time-font-size:20px;
+    in property <length> tip-font-size:30px;
+    in property <length> progress-max-width:40px;
+    in property <length> progress-height:20px;
+    in-out property <string> state;
+    in property <string> tip;
+    callback prepare();
+    callback start();
+    callback pause();
+    callback stop();
+    HorizontalLayout {
+        left := Rectangle {
+            max-width: root.progress-max-width;
+            ProgressIndicator {
+                width: parent.height - parent.width;
+                height: root.progress-height;
+                progress: root.data.left-progress;
+                transform-rotation: -90deg;
+            }
+        }
+
+        middle := Rectangle {
+            VerticalLayout {
+                Rectangle {
+                    max-height: root.progress-max-width;
+                    ProgressIndicator {
+                        width: parent.width + left.width / 2 + right.width / 2;
+                        height: root.progress-height;
+                        progress: root.data.up-progress;
+                    }
+                }
+
+                Rectangle {
+                    HorizontalLayout {
+                        spacing: 5px;
+                        Rectangle {
+                            Text {
+                                text: root.data.left-time + root.time-uinit;
+                                font-size: root.time-font-size;
+                                visible: root.data.left-progress > 0;
+                            }
+                        }
+
+                        Rectangle {
+                            horizontal-stretch: 1;
+                            VerticalLayout {
+                                Rectangle {
+                                    Text {
+                                        text: root.data.up-time + root.time-uinit;
+                                        font-size: root.time-font-size;
+                                        visible: root.data.up-progress > 0;
+                                    }
+                                }
+
+                                Rectangle {
+                                    vertical-stretch: 1;
+                                    TouchArea {
+                                        Rectangle {
+                                            max-height: parent.width;
+                                            border-color: #005fb8;
+                                            border-width: 5px;
+                                            border-radius: self.width / 2;
+                                            Text {
+                                                text: root.tip;
+                                                font-size: root.tip-font-size;
+                                            }
+                                        }
+
+                                        clicked => {
+                                            // debug("[debug] current state:",root.state);
+                                            if (root.state == "ready") {
+                                                root.prepare();
+                                            } else if (root.state == "start") {
+                                                root.pause();
+                                            } else if (root.state == "pause") {
+                                                root.stop();
+                                            }
+                                        }
+                                    }
+                                }
+
+                                Rectangle {
+                                    Text {
+                                        text: root.data.down-time + root.time-uinit;
+                                        font-size: root.time-font-size;
+                                        visible: root.data.down-progress > 0;
+                                    }
+                                }
+                            }
+                        }
+
+                        Rectangle {
+                            Text {
+                                text: root.data.right-time + root.time-uinit;
+                                font-size: root.time-font-size;
+                                visible: root.data.right-progress > 0;
+                            }
+                        }
+                    }
+                }
+
+                Rectangle {
+                    max-height: root.progress-max-width;
+                    ProgressIndicator {
+                        width: parent.width + left.width / 2 + right.width / 2;
+                        height: root.progress-height;
+                        progress: root.data.down-progress;
+                        transform-rotation: 180deg;
+                    }
+                }
+            }
+        }
+
+        right := Rectangle {
+            max-width: root.progress-max-width;
+            ProgressIndicator {
+                progress: root.data.right-progress;
+                width: parent.height - parent.width;
+                height: root.progress-height;
+                transform-rotation: 90deg;
+            }
+        }
+    }
+}
+
+export component MainWindow inherits Window {
+    width: 300px;
+    height: 400px;
+    callback prepare <=> b.prepare;
+    callback start <=> b.start;
+    callback pause <=> b.pause;
+    callback stop <=> b.stop;
+    in-out property <string> breathe-state:"ready";
+    in-out property <string> breathe-tip:"Ready";
+    in-out property <BreatheData> breathe-data;
+    VerticalLayout {
+        padding: 10px;
+        b := Breathe {
+            state: breathe-state;
+            tip: breathe-tip;
+            data: breathe-data;
+            progress-max-width: 30px;
+        }
+    }
+}
