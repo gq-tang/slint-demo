@@ -1,3 +1,3 @@
 fn main() {
-    breathe::main();
+    breathe_lib::main();
 }

@@ -4,25 +4,26 @@ use std::time::{self, Duration};
 
 use slint::TimerMode;
 
+slint::include_modules!();
+
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
-#[cfg(feature = "sw-renderer")]
-slint::slint! {
-    export {MainWindow} from "ui/main.slint";
+#[cfg(all(debug_assertions, target_arch = "wasm32"))]
+fn enable_panic_hook() {
+    console_error_panic_hook::set_once();
 }
 
-#[cfg(not(feature = "sw-renderer"))]
-slint::slint! {
-    export {MainWindow} from "ui/main.slint";
-}
+#[cfg(not(all(debug_assertions, target_arch = "wasm32")))]
+fn enable_panic_hook() {}
 
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen(start))]
 pub fn main() {
-    #[cfg(all(debug_assertions, target_arch = "wasm32"))]
-    console_error_panic_hook::set_once();
+    enable_panic_hook();
 
     let app = MainWindow::new().expect("MainWindow initial failed");
+
+    let pre_timer = Rc::new(slint::Timer::default());
 
     let app_weak = app.as_weak();
     app.on_prepare(move || {
@@ -38,11 +39,10 @@ pub fn main() {
 
         // 倒计时
         let countdown = atomic::AtomicI8::new(3);
-        let timer = Rc::new(slint::Timer::default());
-        let timer2 = timer.clone();
+        let pre_timer_stop = pre_timer.clone();
         let app_weak2 = app.as_weak();
         app.set_breathe_tip(format!("{}", countdown.load(atomic::Ordering::SeqCst)).into());
-        timer.start(
+        pre_timer.start(
             slint::TimerMode::Repeated,
             Duration::from_secs(1),
             move || {
@@ -52,7 +52,7 @@ pub fn main() {
                         app.set_breathe_tip("Go".into());
                         app.set_breathe_state("prepare".into());
                         app.invoke_start();
-                        timer2.stop();
+                        pre_timer_stop.stop();
                         return;
                     } else {
                         app.set_breathe_tip(format!("{}", count).into());
@@ -65,8 +65,8 @@ pub fn main() {
     });
 
     let app_weak = app.as_weak();
-    let timer = Rc::new(slint::Timer::default());
-    let timer_stop = timer.clone();
+    let start_timer = Rc::new(slint::Timer::default());
+    let start_timer_stop = start_timer.clone();
 
     app.on_start(move || {
         let app = match app_weak.upgrade() {
@@ -81,7 +81,7 @@ pub fn main() {
         let circle_count = atomic::AtomicI32::new(0);
         let mut start_time = time::Instant::now();
         let mut step = 0;
-        timer.start(TimerMode::Repeated, Duration::from_millis(100), move || {
+        start_timer.start(TimerMode::Repeated, Duration::from_millis(100), move || {
             let mut left_progress: f32 = 0.0;
             let mut left_time: i32 = 0;
             let mut up_progress: f32 = 0.0;
@@ -174,7 +174,7 @@ pub fn main() {
         }
         app.set_breathe_state("pause".into());
         app.set_breathe_tip("Paused".into());
-        timer_stop.stop();
+        start_timer_stop.stop();
     });
 
     let app_weak = app.as_weak();
